@@ -1,31 +1,39 @@
 import random
 #Import Lyrics
 from pathlib import Path
-lyrics = Path('input.txt').read_text()
-lyriclist = lyrics.split(" ")
-#Initialize list for cleaned lyrics
-cleanedlyriclist = []
-bunch = ""
-iteration = 0
-#Remove any none alphabetical characters
-for clean in lyriclist:
-    if clean.isalpha():
-        cleanedlyriclist.append(clean)
-#Generator code
-for batch in range(0,5):
+key = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
+def keyselector():
+    #Pick a key
+    song_key_int = random.randrange(0, len(key))
+    song_key = key[song_key_int]
+    key_index = key.index(song_key)
+    keydict = {"key": song_key, "key_index": key_index}
+    return keydict
+
+def modeselector():
+    mode = ["Major", "Minor"]
+    #Pick a mode
+    song_mode_int = random.randrange(0, len(mode))
+    song_mode = mode[song_mode_int]
+    return song_mode
+
+def txtload(inputtxt):
+    lyrics = Path(inputtxt).read_text()
+    lyriclist = lyrics.split(" ")
+    #Initialize list for cleaned lyrics
+    cleanedlyriclist = []
+    #Remove any none alphabetical characters
+    for clean in lyriclist:
+        if clean.isalpha():
+            cleanedlyriclist.append(clean)
+    return cleanedlyriclist
+
+def lyricgenerator(inputtxt):
+    cleanedlyriclist = txtload(inputtxt)
     newlyric = []
     #counts frequency of certain lengths of words generated
     fourorless = 0
     fiveormore = 0
-    #Defines keys and modes
-    key = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
-    mode = ["Major", "Minor"]
-    #Pick a key
-    song_key_int = random.randrange(0, len(key))
-    song_key = key[song_key_int]
-    #Pick a mode
-    song_mode_int = random.randrange(0, len(mode))
-    song_mode = mode[song_mode_int]
     #Lyric generator
     for count, lyric in enumerate(range(0,10)):
         #Picks a random int
@@ -52,8 +60,13 @@ for batch in range(0,5):
                     randomint = random.randrange(0, len(cleanedlyriclist))
                     new = cleanedlyriclist.pop(randomint)
         newlyric.append(new)
-    #Lyric number
-    iteration += 1
+    return newlyric
+
+def chordgenerator():
+    keydict = keyselector()
+    song_key = keydict.get("key")
+    key_index = keydict.get("key_index")
+    song_mode = modeselector()
     progression = []
     progressiondict = {}
     #Chord progression generator
@@ -80,8 +93,6 @@ for batch in range(0,5):
             progressiondict[chord] = progressiondict.get(chord) + 1
         #Appends chord onto progression_num list
         progression_num.append(chord)
-        #Selects a number between 0 and 11 based on the key chosen
-        key_index = key.index(song_key)
         #Uses the "chords" list as an index for the "chord_modes" list and checks whether the given chord
         #should be a major, minor, or diminished chord, and appends it appropriately.
         for chosen in progression_num:
@@ -91,10 +102,22 @@ for batch in range(0,5):
                 progression.append("{}m".format(key[chosen - (12 - key_index)]))
             elif chord_modes[chords.index(chosen)] == "Dim":
                 progression.append("{}dim".format(key[chosen - (12 - key_index)]))
+    keymodeprogression = {"key": song_key, "mode": song_mode, "prog": progression}
+    return keymodeprogression
+
+def formatting(inputtxt):
+    lyrics = lyricgenerator(inputtxt)
+    items = chordgenerator()
+    song_key = items.get("key")
+    song_mode = items.get("mode")
+    progression = items.get("prog")
     #Converts the "progression" and "newlyric" lists into strings
     prog_format = " ".join(progression)
-    preformat = " ".join(newlyric)
+    preformat = " ".join(lyrics)
     #Formats the generated lyric, with the key and chord progression, and adds it to the "bunch" str.
-    formatted = "lyric {} in key: {} {}\nChord progression: {}\n{}\n".format(iteration, song_key, song_mode, prog_format, preformat)
-    bunch += formatted
-print(bunch)
+    formatted = "lyric in key: {} {}\nChord progression: {}\n{}\n".format(song_key, song_mode, prog_format, preformat)
+    print(formatted)
+
+
+
+formatting("input.txt")
