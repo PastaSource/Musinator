@@ -1,7 +1,7 @@
 import random
-#Import Lyrics (not sure if this opens, and thus needs to be closed)
+#Import Lyrics
 from pathlib import Path
-lyrics = Path('Combined.txt').read_text()
+lyrics = Path('input.txt').read_text()
 lyriclist = lyrics.split(" ")
 #Initialize list for cleaned lyrics
 cleanedlyriclist = []
