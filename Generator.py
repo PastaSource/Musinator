@@ -69,6 +69,7 @@ def chordgenerator():
     song_mode = modeselector()
     progression = []
     progressiondict = {}
+    progressionint = 1
     #Chord progression generator
     for randomchords in range(0,4):
         progression_num = []
@@ -86,7 +87,6 @@ def chordgenerator():
         #Tracks chord frequency in progressiondict dictionary and prevents chords repeating too often
         if chord not in progressiondict.keys():
             progressiondict[chord] = 1
-            progressionint = 1
         elif chord in progressiondict.keys():
             if progressiondict[chord] >= 2:
                 while chord in progressiondict.keys():
