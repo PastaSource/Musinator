@@ -86,11 +86,13 @@ def chordgenerator():
         #Tracks chord frequency in progressiondict dictionary and prevents chords repeating too often
         if chord not in progressiondict.keys():
             progressiondict[chord] = 1
+            progressionint = 1
         elif chord in progressiondict.keys():
             if progressiondict[chord] >= 2:
                 while chord in progressiondict.keys():
                     chord = chords[random.randrange(0, len(chords))]
-            progressiondict[chord] = progressiondict.get(chord) + 1
+            progressionint += 1
+            progressiondict[chord] = progressionint
         #Appends chord onto progression_num list
         progression_num.append(chord)
         #Uses the "chords" list as an index for the "chord_modes" list and checks whether the given chord
