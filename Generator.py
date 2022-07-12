@@ -65,7 +65,7 @@ def lyricgenerator(inputtxt):
         newlyric.append(new)
     return newlyric
 
-def chordgenerator():
+def chordgenerator(upperrange, frequency):
     keydict = keyselector()
     song_key = keydict.get("key")
     key_index = keydict.get("key_index")
@@ -73,8 +73,9 @@ def chordgenerator():
     progression = []
     progressiondict = {}
     progressionint = 1
+
     #Chord progression generator
-    for randomchords in range(0,4):
+    for randomchords in range(0,upperrange):
         progression_num = []
         #Defines what makes up a major key and selects it
         if song_mode == "Major":
@@ -90,14 +91,32 @@ def chordgenerator():
         #Tracks chord frequency in progressiondict dictionary and prevents chords repeating too often
         if chord not in progressiondict.keys():
             progressiondict[chord] = 1
+            progression_num.append(chord)
         elif chord in progressiondict.keys():
-            if progressiondict[chord] >= 2:
-                while chord in progressiondict.keys():
+            attempt = 0
+            progressionint = progressiondict[chord]
+#            print("test1")
+            if progressiondict[chord] <= (frequency - 1):
+                progressionint += 1
+                progressiondict[chord] = progressionint
+                progression_num.append(chord)
+#                print("test2")
+            elif progressiondict[chord] >= frequency:
+#                print("test3")
+                while chord in progressiondict.keys() and attempt <= 10:
                     chord = chords[random.randrange(0, len(chords))]
-            progressionint += 1
-            progressiondict[chord] = progressionint
+                    attempt += 1
+#                    print("test4")
+                #Possibly redundent code, could try printing something to see if this section below occures
+                if attempt <= 10:
+                    progressionint += 1
+                    progressiondict[chord] = progressionint
+                    progression_num.append(chord)
+                else:
+                    pass
+#            print(progressionint)
         #Appends chord onto progression_num list
-        progression_num.append(chord)
+
         #Uses the "chords" list as an index for the "chord_modes" list and checks whether the given chord
         #should be a major, minor, or diminished chord, and appends it appropriately.
         for chosen in progression_num:
@@ -110,9 +129,9 @@ def chordgenerator():
     keymodeprogression = {"key": song_key, "mode": song_mode, "prog": progression}
     return keymodeprogression
 
-def formatting(inputtxt):
+def formatting(inputtxt, upperrange, frequency):
     lyrics = lyricgenerator(inputtxt)
-    items = chordgenerator()
+    items = chordgenerator(upperrange, frequency)
     song_key = items.get("key")
     song_mode = items.get("mode")
     progression = items.get("prog")
@@ -125,20 +144,28 @@ def formatting(inputtxt):
 
 #Performs checks on user input
 def numericcheck(amount):
-    iterations = amount
-    if not str(iterations).isnumeric():
+    userinput = amount
+    if not str(userinput).isnumeric():
         print("ERROR! Input must be numeric.")
         return False
-    elif int(iterations) <= 0 or int(iterations) >= 100:
+    elif int(userinput) <= 0 or int(userinput) >= 100:
         print("ERROR! Input must be between 0 and 99.")
         return False
-    return iterations
+    return userinput
 
 #Allow the user to decide how many generations are to be made.
 iterations = input("Please enter the amount of iterations to generate (1-99): ")
 while numericcheck(iterations) is False:
     iterations = input("Please enter the amount of iterations to generate (1-99): ")
+#Allow the user to choose how many chords are generated in a progression.
+upperrange = input("Please choose the amount of chords per progression (1-99): ")
+while numericcheck(upperrange) is False:
+    upperrange = input("Please choose the amount of chords per progression (1-99): ")
+#Allow the user to choose the frequency of how often a chord can appear in a progression.
+frequency = input("Please choose how many times a chord can appear in a progression (1-99): ")
+while numericcheck(frequency) is False:
+    frequency = input("Please choose how many times a chord can appear in a progression (1-99): ")
 #For loop using user input to determine amount of iterations to generate.
 for iteration in range(int(iterations)):
-    generations += formatting("input.txt")
+    generations += formatting("input.txt", int(upperrange), int(frequency))
 print(generations)
