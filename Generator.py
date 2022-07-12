@@ -1,7 +1,10 @@
 import random
 #Import Lyrics
 from pathlib import Path
+#Defines keys
 key = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
+#Stores generations in str variable.
+generations = ""
 def keyselector():
     #Pick a key
     song_key_int = random.randrange(0, len(key))
@@ -69,6 +72,7 @@ def chordgenerator():
     song_mode = modeselector()
     progression = []
     progressiondict = {}
+    progressionint = 1
     #Chord progression generator
     for randomchords in range(0,4):
         progression_num = []
@@ -86,7 +90,6 @@ def chordgenerator():
         #Tracks chord frequency in progressiondict dictionary and prevents chords repeating too often
         if chord not in progressiondict.keys():
             progressiondict[chord] = 1
-            progressionint = 1
         elif chord in progressiondict.keys():
             if progressiondict[chord] >= 2:
                 while chord in progressiondict.keys():
@@ -118,8 +121,24 @@ def formatting(inputtxt):
     preformat = " ".join(lyrics)
     #Formats the generated lyric, with the key and chord progression, and adds it to the "bunch" str.
     formatted = "lyric in key: {} {}\nChord progression: {}\n{}\n".format(song_key, song_mode, prog_format, preformat)
-    print(formatted)
+    return formatted
 
+#Performs checks on user input
+def numericcheck(amount):
+    iterations = amount
+    if not str(iterations).isnumeric():
+        print("ERROR! Input must be numeric.")
+        return False
+    elif int(iterations) <= 0 or int(iterations) >= 100:
+        print("ERROR! Input must be between 0 and 99.")
+        return False
+    return iterations
 
-
-formatting("input.txt")
+#Allow the user to decide how many generations are to be made.
+iterations = input("Please enter the amount of iterations to generate (1-99): ")
+while numericcheck(iterations) is False:
+    iterations = input("Please enter the amount of iterations to generate (1-99): ")
+#For loop using user input to determine amount of iterations to generate.
+for iteration in range(int(iterations)):
+    generations += formatting("input.txt")
+print(generations)
