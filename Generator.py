@@ -1,25 +1,18 @@
 import random
-#Import Lyrics
 from pathlib import Path
-#Defines keys
-key = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
-#Stores generations in str variable.
-generations = ""
+#Key and mode selector functions
 def keyselector():
-    #Pick a key
     song_key_int = random.randrange(0, len(key))
     song_key = key[song_key_int]
     key_index = key.index(song_key)
     keydict = {"key": song_key, "key_index": key_index}
     return keydict
-
 def modeselector():
     mode = ["Major", "Minor"]
-    #Pick a mode
     song_mode_int = random.randrange(0, len(mode))
     song_mode = mode[song_mode_int]
     return song_mode
-
+#Import txt file
 def txtload(inputtxt):
     lyrics = Path(inputtxt).read_text()
     lyriclist = lyrics.split(" ")
@@ -30,11 +23,11 @@ def txtload(inputtxt):
         if clean.isalpha():
             cleanedlyriclist.append(clean)
     return cleanedlyriclist
-
+#Randomly picks words from imported TXT file
 def lyricgenerator(inputtxt):
     cleanedlyriclist = txtload(inputtxt)
     newlyric = []
-    #counts frequency of certain lengths of words generated
+    #Counts frequency of certain lengths of words generated
     fourorless = 0
     fiveormore = 0
     #Lyric generator
@@ -43,7 +36,7 @@ def lyricgenerator(inputtxt):
         randomint = random.randrange(0, len(cleanedlyriclist))
         #Uses random int to select word at that position in cleaned lyric list
         new = cleanedlyriclist.pop(randomint)
-        #Only adds word to the lyric list if not already in it
+        #Checks if chosen word is already in newlyric list
         if new in newlyric:
             #Generates a new int in an attempt to add a word not already in the list
             while new in newlyric:
@@ -64,7 +57,7 @@ def lyricgenerator(inputtxt):
                     new = cleanedlyriclist.pop(randomint)
         newlyric.append(new)
     return newlyric
-
+#Generates a chord progression
 def chordgenerator(upperrange, frequency):
     keydict = keyselector()
     song_key = keydict.get("key")
@@ -73,7 +66,6 @@ def chordgenerator(upperrange, frequency):
     progression = []
     progressiondict = {}
     progressionint = 1
-
     #Chord progression generator
     for randomchords in range(0,upperrange):
         progression_num = []
@@ -115,8 +107,6 @@ def chordgenerator(upperrange, frequency):
                 else:
                     pass
 #            print(progressionint)
-        #Appends chord onto progression_num list
-
         #Uses the "chords" list as an index for the "chord_modes" list and checks whether the given chord
         #should be a major, minor, or diminished chord, and appends it appropriately.
         for chosen in progression_num:
@@ -128,7 +118,7 @@ def chordgenerator(upperrange, frequency):
                 progression.append("{}dim".format(key[chosen - (12 - key_index)]))
     keymodeprogression = {"key": song_key, "mode": song_mode, "prog": progression}
     return keymodeprogression
-
+#Key function that sends commands to other functions and returns a formatted string.
 def formatting(inputtxt, upperrange, frequency):
     lyrics = lyricgenerator(inputtxt)
     items = chordgenerator(upperrange, frequency)
@@ -141,7 +131,6 @@ def formatting(inputtxt, upperrange, frequency):
     #Formats the generated lyric, with the key and chord progression, and adds it to the "bunch" str.
     formatted = "lyric in key: {} {}\nChord progression: {}\n{}\n".format(song_key, song_mode, prog_format, preformat)
     return formatted
-
 #Performs checks on user input
 def numericcheck(amount):
     userinput = amount
@@ -152,7 +141,10 @@ def numericcheck(amount):
         print("ERROR! Input must be between 0 and 99.")
         return False
     return userinput
-
+#Defines keys
+key = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
+#Stores generations in str variable.
+generations = ""
 #Allow the user to decide how many generations are to be made.
 iterations = input("Please enter the amount of iterations to generate (1-99): ")
 while numericcheck(iterations) is False:
