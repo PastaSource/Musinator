@@ -37,10 +37,6 @@ def lyricgenerator(inputtxt, upperrange):
         #Uses random int to select word at that position in cleaned lyric list
         new = cleanedlyriclist.pop(randomint)
         #Checks if chosen word is already in newlyric list
-#        if len(newlyric) >= 1:
-#            if len(newlyric[len(newlyric) -1]) <= 1 and len(new) <= 1:
-#                randomint = random.randrange(0, len(cleanedlyriclist))
-#                new = cleanedlyriclist.pop(randomint)
         if new in newlyric:
             #Generates a new int in an attempt to add a word not already in the list
             while new in newlyric:
