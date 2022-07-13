@@ -1,25 +1,18 @@
 import random
-#Import Lyrics
 from pathlib import Path
-#Defines keys
-key = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
-#Stores generations in str variable.
-generations = ""
+#Key and mode selector functions
 def keyselector():
-    #Pick a key
     song_key_int = random.randrange(0, len(key))
     song_key = key[song_key_int]
     key_index = key.index(song_key)
     keydict = {"key": song_key, "key_index": key_index}
     return keydict
-
 def modeselector():
     mode = ["Major", "Minor"]
-    #Pick a mode
     song_mode_int = random.randrange(0, len(mode))
     song_mode = mode[song_mode_int]
     return song_mode
-
+#Import txt file
 def txtload(inputtxt):
     lyrics = Path(inputtxt).read_text()
     lyriclist = lyrics.split(" ")
@@ -30,41 +23,53 @@ def txtload(inputtxt):
         if clean.isalpha():
             cleanedlyriclist.append(clean)
     return cleanedlyriclist
-
-def lyricgenerator(inputtxt):
+#Randomly picks words from imported TXT file
+def lyricgenerator(inputtxt, upperrange):
     cleanedlyriclist = txtload(inputtxt)
     newlyric = []
-    #counts frequency of certain lengths of words generated
+    #Counts frequency of certain lengths of words generated
     fourorless = 0
     fiveormore = 0
     #Lyric generator
-    for count, lyric in enumerate(range(0,10)):
+    for lyric in range(0,upperrange):
         #Picks a random int
         randomint = random.randrange(0, len(cleanedlyriclist))
         #Uses random int to select word at that position in cleaned lyric list
         new = cleanedlyriclist.pop(randomint)
-        #Only adds word to the lyric list if not already in it
+        #Checks if chosen word is already in newlyric list
+#        if len(newlyric) >= 1:
+#            if len(newlyric[len(newlyric) -1]) <= 1 and len(new) <= 1:
+#                randomint = random.randrange(0, len(cleanedlyriclist))
+#                new = cleanedlyriclist.pop(randomint)
         if new in newlyric:
             #Generates a new int in an attempt to add a word not already in the list
             while new in newlyric:
                 randomint = random.randrange(0, len(cleanedlyriclist))
                 new = cleanedlyriclist.pop(randomint)
             #Avoids multiple single character words in succession
-            while newlyric[count-1] == 1:
+            while len(newlyric[len(newlyric) -1]) <= 1 and len(new) <= 1:
                 randomint = random.randrange(0, len(cleanedlyriclist))
                 new = cleanedlyriclist.pop(randomint)
         #Reduces frequency of low length words
-        elif len(new) >= 5:
+        if fourorless < (upperrange // 2):
+            if len(new) <= 4:
+                fourorless += 1
+        if fiveormore < (upperrange // 2):
+            if len(new) >= 5:
+                fiveormore += 1
+        if fourorless >= (upperrange // 2) and len(new) <= 4:
+            while len(new) <= 4:
+                randomint = random.randrange(0, len(cleanedlyriclist))
+                new = cleanedlyriclist.pop(randomint)
             fiveormore += 1
-        elif len(new) <= 4:
+        if fiveormore >= (upperrange // 2) and len(new) >= 5:
+            while len(new) >= 5:
+                randomint = random.randrange(0, len(cleanedlyriclist))
+                new = cleanedlyriclist.pop(randomint)
             fourorless += 1
-            if fourorless >= 5:
-                while len(new) <= 4:
-                    randomint = random.randrange(0, len(cleanedlyriclist))
-                    new = cleanedlyriclist.pop(randomint)
         newlyric.append(new)
     return newlyric
-
+#Generates a chord progression
 def chordgenerator(upperrange, frequency):
     keydict = keyselector()
     song_key = keydict.get("key")
@@ -73,7 +78,6 @@ def chordgenerator(upperrange, frequency):
     progression = []
     progressiondict = {}
     progressionint = 1
-
     #Chord progression generator
     for randomchords in range(0,upperrange):
         progression_num = []
@@ -115,8 +119,6 @@ def chordgenerator(upperrange, frequency):
                 else:
                     pass
 #            print(progressionint)
-        #Appends chord onto progression_num list
-
         #Uses the "chords" list as an index for the "chord_modes" list and checks whether the given chord
         #should be a major, minor, or diminished chord, and appends it appropriately.
         for chosen in progression_num:
@@ -128,10 +130,10 @@ def chordgenerator(upperrange, frequency):
                 progression.append("{}dim".format(key[chosen - (12 - key_index)]))
     keymodeprogression = {"key": song_key, "mode": song_mode, "prog": progression}
     return keymodeprogression
-
-def formatting(inputtxt, upperrange, frequency):
-    lyrics = lyricgenerator(inputtxt)
-    items = chordgenerator(upperrange, frequency)
+#Key function that sends commands to other functions and returns a formatted string.
+def formatting(inputtxt, lyricupperrange, chordupperrange, frequency):
+    lyrics = lyricgenerator(inputtxt, lyricupperrange)
+    items = chordgenerator(chordupperrange, frequency)
     song_key = items.get("key")
     song_mode = items.get("mode")
     progression = items.get("prog")
@@ -141,7 +143,6 @@ def formatting(inputtxt, upperrange, frequency):
     #Formats the generated lyric, with the key and chord progression, and adds it to the "bunch" str.
     formatted = "lyric in key: {} {}\nChord progression: {}\n{}\n".format(song_key, song_mode, prog_format, preformat)
     return formatted
-
 #Performs checks on user input
 def numericcheck(amount):
     userinput = amount
@@ -152,20 +153,27 @@ def numericcheck(amount):
         print("ERROR! Input must be between 0 and 99.")
         return False
     return userinput
-
+#Defines keys
+key = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
+#Stores generations in str variable.
+generations = ""
 #Allow the user to decide how many generations are to be made.
 iterations = input("Please enter the amount of iterations to generate (1-99): ")
 while numericcheck(iterations) is False:
     iterations = input("Please enter the amount of iterations to generate (1-99): ")
+#Allow the user to choose how many words to generate in a lyric.
+lyricupperrange = input("Please choose the amount of words per lyric (1-99): ")
+while numericcheck(lyricupperrange) is False:
+    lyricupperrange = input("Please choose the amount of words per lyric (1-99): ")
 #Allow the user to choose how many chords are generated in a progression.
-upperrange = input("Please choose the amount of chords per progression (1-99): ")
-while numericcheck(upperrange) is False:
-    upperrange = input("Please choose the amount of chords per progression (1-99): ")
+chordupperrange = input("Please choose the amount of chords per progression (1-99): ")
+while numericcheck(chordupperrange) is False:
+    chordupperrange = input("Please choose the amount of chords per progression (1-99): ")
 #Allow the user to choose the frequency of how often a chord can appear in a progression.
 frequency = input("Please choose how many times a chord can appear in a progression (1-99): ")
 while numericcheck(frequency) is False:
     frequency = input("Please choose how many times a chord can appear in a progression (1-99): ")
 #For loop using user input to determine amount of iterations to generate.
 for iteration in range(int(iterations)):
-    generations += formatting("input.txt", int(upperrange), int(frequency))
+    generations += formatting("input.txt", int(lyricupperrange), int(chordupperrange), int(frequency))
 print(generations)
