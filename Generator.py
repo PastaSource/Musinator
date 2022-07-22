@@ -77,15 +77,36 @@ def chordgenerator(upperrange, frequency):
     #Chord progression generator
     for randomchords in range(0,upperrange):
         progression_num = []
-        #Defines what makes up a major key and selects it
+        #Chord numberings are their positions from the root key minus 1
+        #Defines what makes up a Major/Ionian key and selects it
         if song_mode == "Major":
-            #Chord numberings are their positions from the root key minus 1
             chords = [0, 2, 4, 5, 7, 9, 11]
             chord_modes = ["Major", "Minor", "Minor", "Major", "Major", "Minor", "Dim"]
-        #Defines what makes up a minor key and selects it
-        elif song_mode == "Minor":
+        #Defines what makes up a Dorian key and selects it
+        if song_mode == "Dorian":
+            chords = [0, 2, 3, 5, 7, 9, 10]
+            chord_modes = ["Minor", "Minor", "Major", "Major", "Minor", "Dim", "Major"]
+        #Defines what makes up a Phyrgian key and selects it
+        if song_mode == "Phyrgian":
+            chords = [0, 1, 3, 5, 7, 8, 10]
+            chord_modes = ["Minor", "Major", "Major", "Minor", "Dim", "Major", "Minor"]
+        #Defines what makes up a Lydian key and selects it
+        if song_mode == "Lydian":
+            chords = [0, 2, 4, 6, 7, 9, 11]
+            chord_modes = ["Major", "Major", "Minor", "Dim", "Major", "Minor", "Minor"]
+        #Defines what makes up a Mixolydian key and selects it
+        if song_mode == "Mixolydian":
+            chords = [0, 2, 4, 5, 7, 9, 10]
+            chord_modes = ["Major", "Minor", "Dim", "Major", "Minor", "Minor", "Major"]
+        #Defines what makes up a Minor/Aeolian key and selects it
+        if song_mode == "Minor":
             chords = [0, 2, 3, 5, 7, 8, 10]
             chord_modes = ["Minor", "Dim", "Major", "Minor", "Minor", "Major", "Major"]
+        #Defines what makes up a Locrian key and selects it
+        if song_mode == "Locrian":
+            chords = [0, 1, 3, 5, 6, 8, 10]
+            chord_modes = ["Dim", "Major", "Minor", "Minor", "Major", "Major", "Minor"]
+
         #Picks a random number from the "chords" list
         chord = chords[random.randrange(0, len(chords))]
         #Tracks chord frequency in progressiondict dictionary and prevents chords repeating too often
