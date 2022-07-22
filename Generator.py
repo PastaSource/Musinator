@@ -7,8 +7,11 @@ def keyselector():
     key_index = key.index(song_key)
     keydict = {"key": song_key, "key_index": key_index}
     return keydict
-def modeselector():
-    mode = ["Major", "Minor"]
+def modeselector(complexity):
+    if complexity == 1:
+        mode = ["Major", "Minor", "Phrygian", "Locrian", "Dorian", "Lydian", "Mixolydian"]
+    else:
+        mode = ["Major", "Minor"]
     song_mode_int = random.randrange(0, len(mode))
     song_mode = mode[song_mode_int]
     return song_mode
@@ -66,11 +69,11 @@ def lyricgenerator(inputtxt, upperrange):
         newlyric.append(new)
     return newlyric
 #Generates a chord progression
-def chordgenerator(upperrange, frequency):
+def chordgenerator(upperrange, frequency, complexity):
     keydict = keyselector()
     song_key = keydict.get("key")
     key_index = keydict.get("key_index")
-    song_mode = modeselector()
+    song_mode = modeselector(complexity)
     progression = []
     progressiondict = {}
     progressionint = 1
@@ -142,9 +145,9 @@ def chordgenerator(upperrange, frequency):
     keymodeprogression = {"key": song_key, "mode": song_mode, "prog": progression}
     return keymodeprogression
 #Key function that sends commands to other functions and returns a formatted string.
-def formatting(inputtxt, lyricupperrange, chordupperrange, frequency):
+def formatting(inputtxt, lyricupperrange, chordupperrange, frequency, complexity):
     lyrics = lyricgenerator(inputtxt, lyricupperrange)
-    items = chordgenerator(chordupperrange, frequency)
+    items = chordgenerator(chordupperrange, frequency, complexity)
     song_key = items.get("key")
     song_mode = items.get("mode")
     progression = items.get("prog")
@@ -180,11 +183,15 @@ while numericcheck(lyricupperrange) is False:
 chordupperrange = input("Please choose the amount of chords per progression (1-99): ")
 while numericcheck(chordupperrange) is False:
     chordupperrange = input("Please choose the amount of chords per progression (1-99): ")
+#Allow the user to generate progressions with more uncommon modes.
+complexity = input("Please enter 1 for uncommon modes (e.g. Locrian, Dorian, etc.): ")
+while numericcheck(complexity) is False:
+    complexity = input("Please enter 1 for uncommon modes (e.g. Locrian, Dorian, etc.): ")
 #Allow the user to choose the frequency of how often a chord can appear in a progression.
 frequency = input("Please choose how many times a chord can appear in a progression (1-99): ")
 while numericcheck(frequency) is False:
     frequency = input("Please choose how many times a chord can appear in a progression (1-99): ")
 #For loop using user input to determine amount of iterations to generate.
 for iteration in range(int(iterations)):
-    generations += formatting("input.txt", int(lyricupperrange), int(chordupperrange), int(frequency))
+    generations += formatting("input.txt", int(lyricupperrange), int(chordupperrange), int(frequency), int(complexity))
 print(generations)
