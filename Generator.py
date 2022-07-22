@@ -37,10 +37,6 @@ def lyricgenerator(inputtxt, upperrange):
         #Uses random int to select word at that position in cleaned lyric list
         new = cleanedlyriclist.pop(randomint)
         #Checks if chosen word is already in newlyric list
-#        if len(newlyric) >= 1:
-#            if len(newlyric[len(newlyric) -1]) <= 1 and len(new) <= 1:
-#                randomint = random.randrange(0, len(cleanedlyriclist))
-#                new = cleanedlyriclist.pop(randomint)
         if new in newlyric:
             #Generates a new int in an attempt to add a word not already in the list
             while new in newlyric:
@@ -99,26 +95,20 @@ def chordgenerator(upperrange, frequency):
         elif chord in progressiondict.keys():
             attempt = 0
             progressionint = progressiondict[chord]
-#            print("test1")
             if progressiondict[chord] <= (frequency - 1):
                 progressionint += 1
                 progressiondict[chord] = progressionint
                 progression_num.append(chord)
-#                print("test2")
             elif progressiondict[chord] >= frequency:
-#                print("test3")
                 while chord in progressiondict.keys() and attempt <= 10:
                     chord = chords[random.randrange(0, len(chords))]
                     attempt += 1
-#                    print("test4")
-                #Possibly redundent code, could try printing something to see if this section below occures
                 if attempt <= 10:
                     progressionint += 1
                     progressiondict[chord] = progressionint
                     progression_num.append(chord)
                 else:
                     pass
-#            print(progressionint)
         #Uses the "chords" list as an index for the "chord_modes" list and checks whether the given chord
         #should be a major, minor, or diminished chord, and appends it appropriately.
         for chosen in progression_num:
