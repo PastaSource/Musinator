@@ -169,7 +169,7 @@ def numericcheck(amount):
         return False
     return userinput
 
-def uservariables(uservalues):
+def main(uservalues):
     generations = ""
     iterations = 4
     lyric_upperrange = 8
@@ -232,5 +232,6 @@ key = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
 # for iteration in range(int(iterations)):
 #     generations += formatting("input.txt", int(lyricupperrange), int(chordupperrange), int(frequency), int(complexity))
 # print(generations)
-uservariables(sys.argv)
+if __name__ =='__main__':
+    main(sys.argv)
 
