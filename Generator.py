@@ -1,4 +1,6 @@
 import random
+import sys
+import getopt
 from pathlib import Path
 #Key and mode selector functions
 def keyselector():
@@ -7,8 +9,12 @@ def keyselector():
     key_index = key.index(song_key)
     keydict = {"key": song_key, "key_index": key_index}
     return keydict
-def modeselector():
-    mode = ["Major", "Minor"]
+
+def modeselector(complexity):
+    if complexity == 1:
+        mode = ["Major", "Minor", "Phrygian", "Locrian", "Dorian", "Lydian", "Mixolydian"]
+    else:
+        mode = ["Major", "Minor"]
     song_mode_int = random.randrange(0, len(mode))
     song_mode = mode[song_mode_int]
     return song_mode
@@ -66,26 +72,46 @@ def lyricgenerator(inputtxt, upperrange):
         newlyric.append(new)
     return newlyric
 #Generates a chord progression
-def chordgenerator(upperrange, frequency):
+def chordgenerator(upperrange, frequency, complexity):
     keydict = keyselector()
     song_key = keydict.get("key")
     key_index = keydict.get("key_index")
-    song_mode = modeselector()
+    song_mode = modeselector(complexity)
     progression = []
     progressiondict = {}
     progressionint = 1
     #Chord progression generator
     for randomchords in range(0,upperrange):
         progression_num = []
-        #Defines what makes up a major key and selects it
+        #Chord numberings are their positions from the root key minus 1
+        #Defines what makes up a Major/Ionian key and selects it
         if song_mode == "Major":
-            #Chord numberings are their positions from the root key minus 1
             chords = [0, 2, 4, 5, 7, 9, 11]
             chord_modes = ["Major", "Minor", "Minor", "Major", "Major", "Minor", "Dim"]
-        #Defines what makes up a minor key and selects it
-        elif song_mode == "Minor":
+        #Defines what makes up a Dorian key and selects it
+        if song_mode == "Dorian":
+            chords = [0, 2, 3, 5, 7, 9, 10]
+            chord_modes = ["Minor", "Minor", "Major", "Major", "Minor", "Dim", "Major"]
+        #Defines what makes up a Phyrgian key and selects it
+        if song_mode == "Phyrgian":
+            chords = [0, 1, 3, 5, 7, 8, 10]
+            chord_modes = ["Minor", "Major", "Major", "Minor", "Dim", "Major", "Minor"]
+        #Defines what makes up a Lydian key and selects it
+        if song_mode == "Lydian":
+            chords = [0, 2, 4, 6, 7, 9, 11]
+            chord_modes = ["Major", "Major", "Minor", "Dim", "Major", "Minor", "Minor"]
+        #Defines what makes up a Mixolydian key and selects it
+        if song_mode == "Mixolydian":
+            chords = [0, 2, 4, 5, 7, 9, 10]
+            chord_modes = ["Major", "Minor", "Dim", "Major", "Minor", "Minor", "Major"]
+        #Defines what makes up a Minor/Aeolian key and selects it
+        if song_mode == "Minor":
             chords = [0, 2, 3, 5, 7, 8, 10]
             chord_modes = ["Minor", "Dim", "Major", "Minor", "Minor", "Major", "Major"]
+        #Defines what makes up a Locrian key and selects it
+        if song_mode == "Locrian":
+            chords = [0, 1, 3, 5, 6, 8, 10]
+            chord_modes = ["Dim", "Major", "Minor", "Minor", "Major", "Major", "Minor"]
         #Picks a random number from the "chords" list
         chord = chords[random.randrange(0, len(chords))]
         #Tracks chord frequency in progressiondict dictionary and prevents chords repeating too often
@@ -121,9 +147,9 @@ def chordgenerator(upperrange, frequency):
     keymodeprogression = {"key": song_key, "mode": song_mode, "prog": progression}
     return keymodeprogression
 #Key function that sends commands to other functions and returns a formatted string.
-def formatting(inputtxt, lyricupperrange, chordupperrange, frequency):
+def formatting(inputtxt, lyricupperrange, chordupperrange, complexity, frequency):
     lyrics = lyricgenerator(inputtxt, lyricupperrange)
-    items = chordgenerator(chordupperrange, frequency)
+    items = chordgenerator(chordupperrange, frequency, complexity)
     song_key = items.get("key")
     song_mode = items.get("mode")
     progression = items.get("prog")
@@ -140,30 +166,61 @@ def numericcheck(amount):
         print("ERROR! Input must be numeric.")
         return False
     elif int(userinput) <= 0 or int(userinput) >= 100:
-        print("ERROR! Input must be between 0 and 99.")
+        print("ERROR! Input must be between 1 and 99.")
         return False
     return userinput
+
+def table_maker(data_list):
+    default_length = 25
+    for item in data_list:
+        print(item[0], " "*(default_length-len(item[0])), item[1])
+
+def main(uservalues):
+    generations = ""
+    iterations = 4
+    lyric_upperrange = 8
+    chord_upperrange = 4
+    uncommon_chords = 0
+    chord_frequency = 2
+    user_options = [["-h | --help", "shows help"],
+               ["-i | --iterations", "set how many results to generate (1-99)"],
+               ["-l | --lyric_upperrange", "set how many words to generate in a lyric (1-99)"],
+               ["-c | --chord_upperrange", "set how many chords to generate (1-99)"],
+               ["-u | --uncommon_chords", "set to use uncommon modes e.g. Locrian, Lydian, etc. (1 to enable)"],
+               ["-f | --chord_frequency", "set how often a chord can appear in a progression (1-99)"]]
+    help = "Musinator developed 2022 by Aaron Newbigging" \
+           "\nOptions:"
+    
+    try:
+        options, userinput = getopt.getopt(uservalues[1:], "hi:l:c:u:f:", ["help", "iterations=", "lyric_upperrange=",
+        "uncommon_chords=", "chord_frequency="])
+    except:
+        print("ERROR!!!")
+        print(help)
+        sys.exit(2)
+
+    for option, value in options:
+        if option in ("-h", "--help"):
+            print(help)
+            table_maker(user_options)
+            sys.exit(2)
+        elif option in ("-i", "--iterations"):
+            iterations = value
+        elif option in ("-l", "--lyric_upperrange"):
+            lyric_upperrange = value
+        elif option in ("-c", "--chord_upperrange"):
+            chord_upperrange = value
+        elif option in ("-u", "--uncommon_chords"):
+            uncommon_chords = value
+        elif option in ("-f", "--chord_frequency"):
+            chord_frequency = value
+    for iteration in range(int(iterations)):
+        generations += formatting("input.txt", int(lyric_upperrange), int(chord_upperrange), int(uncommon_chords),
+                                  int(chord_frequency))
+    print(generations)
+
 #Defines keys
 key = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
-#Stores generations in str variable.
-generations = ""
-#Allow the user to decide how many generations are to be made.
-iterations = input("Please enter the amount of iterations to generate (1-99): ")
-while numericcheck(iterations) is False:
-    iterations = input("Please enter the amount of iterations to generate (1-99): ")
-#Allow the user to choose how many words to generate in a lyric.
-lyricupperrange = input("Please choose the amount of words per lyric (1-99): ")
-while numericcheck(lyricupperrange) is False:
-    lyricupperrange = input("Please choose the amount of words per lyric (1-99): ")
-#Allow the user to choose how many chords are generated in a progression.
-chordupperrange = input("Please choose the amount of chords per progression (1-99): ")
-while numericcheck(chordupperrange) is False:
-    chordupperrange = input("Please choose the amount of chords per progression (1-99): ")
-#Allow the user to choose the frequency of how often a chord can appear in a progression.
-frequency = input("Please choose how many times a chord can appear in a progression (1-99): ")
-while numericcheck(frequency) is False:
-    frequency = input("Please choose how many times a chord can appear in a progression (1-99): ")
-#For loop using user input to determine amount of iterations to generate.
-for iteration in range(int(iterations)):
-    generations += formatting("input.txt", int(lyricupperrange), int(chordupperrange), int(frequency))
-print(generations)
+
+if __name__ =='__main__':
+    main(sys.argv)
