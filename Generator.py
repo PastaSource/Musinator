@@ -9,6 +9,7 @@ def keyselector():
     key_index = key.index(song_key)
     keydict = {"key": song_key, "key_index": key_index}
     return keydict
+
 def modeselector(complexity):
     if complexity == 1:
         mode = ["Major", "Minor", "Phrygian", "Locrian", "Dorian", "Lydian", "Mixolydian"]
@@ -169,6 +170,11 @@ def numericcheck(amount):
         return False
     return userinput
 
+def table_maker(data_list):
+    default_length = 25
+    for item in data_list:
+        print(item[0], " "*(default_length-len(item[0])), item[1])
+
 def main(uservalues):
     generations = ""
     iterations = 4
@@ -176,19 +182,27 @@ def main(uservalues):
     chord_upperrange = 4
     uncommon_chords = 0
     chord_frequency = 2
-    help = "Hello I'm here to help you use this script :>"
+    user_options = [["-h | --help", "shows help"],
+               ["-i | --iterations", "set how many results to generate (1-99)"],
+               ["-l | --lyric_upperrange", "set how many words to generate in a lyric (1-99)"],
+               ["-c | --chord_upperrange", "set how many chords to generate (1-99)"],
+               ["-u | --uncommon_chords", "set to use uncommon modes e.g. Locrian, Lydian, etc. (1 to enable)"],
+               ["-f | --chord_frequency", "set how often a chord can appear in a progression (1-99)"]]
+    help = "Musinator developed 2022 by Aaron Newbigging" \
+           "\nOptions:"
     
     try:
         options, userinput = getopt.getopt(uservalues[1:], "hi:l:c:u:f:", ["help", "iterations=", "lyric_upperrange=",
         "uncommon_chords=", "chord_frequency="])
     except:
-        print("ERROR!!! :<")
+        print("ERROR!!!")
         print(help)
         sys.exit(2)
 
     for option, value in options:
         if option in ("-h", "--help"):
             print(help)
+            table_maker(user_options)
             sys.exit(2)
         elif option in ("-i", "--iterations"):
             iterations = value
@@ -201,37 +215,12 @@ def main(uservalues):
         elif option in ("-f", "--chord_frequency"):
             chord_frequency = value
     for iteration in range(int(iterations)):
-        generations += formatting("input.txt", int(lyric_upperrange), int(chord_upperrange), int(uncommon_chords), int(chord_frequency))
+        generations += formatting("input.txt", int(lyric_upperrange), int(chord_upperrange), int(uncommon_chords),
+                                  int(chord_frequency))
     print(generations)
 
 #Defines keys
 key = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
-#Stores generations in str variable.
 
-#Allow the user to decide how many generations are to be made.
-# iterations = input("Please enter the amount of iterations to generate (1-99): ")
-# while numericcheck(iterations) is False:
-#     iterations = input("Please enter the amount of iterations to generate (1-99): ")
-# #Allow the user to choose how many words to generate in a lyric.
-# lyricupperrange = input("Please choose the amount of words per lyric (1-99): ")
-# while numericcheck(lyricupperrange) is False:
-#     lyricupperrange = input("Please choose the amount of words per lyric (1-99): ")
-# #Allow the user to choose how many chords are generated in a progression.
-# chordupperrange = input("Please choose the amount of chords per progression (1-99): ")
-# while numericcheck(chordupperrange) is False:
-#     chordupperrange = input("Please choose the amount of chords per progression (1-99): ")
-# #Allow the user to generate progressions with more uncommon modes.
-# complexity = input("Please enter 1 for uncommon modes (e.g. Locrian, Dorian, etc.): ")
-# while numericcheck(complexity) is False:
-#     complexity = input("Please enter 1 for uncommon modes (e.g. Locrian, Dorian, etc.): ")
-# #Allow the user to choose the frequency of how often a chord can appear in a progression.
-# frequency = input("Please choose how many times a chord can appear in a progression (1-99): ")
-# while numericcheck(frequency) is False:
-#     frequency = input("Please choose how many times a chord can appear in a progression (1-99): ")
-# #For loop using user input to determine amount of iterations to generate.
-# for iteration in range(int(iterations)):
-#     generations += formatting("input.txt", int(lyricupperrange), int(chordupperrange), int(frequency), int(complexity))
-# print(generations)
 if __name__ =='__main__':
     main(sys.argv)
-
